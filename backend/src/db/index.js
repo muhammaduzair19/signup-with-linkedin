@@ -3,6 +3,7 @@ import { MONGODB_URI } from "../config/config.js";
 
 
 const connectDB = async () => {
+    
     try {
         const conn = await mongoose.connect(MONGODB_URI)
         console.log('\n MONGODB CONNECTED !! 🎉🎉🎉, DB HOST ON: ', conn.connection.host);

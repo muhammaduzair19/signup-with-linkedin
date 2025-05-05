@@ -2,6 +2,7 @@ import connectDB from "./db/index.js";
 import { app } from "./app.js";
 import { PORT } from "./config/config.js";
 
+
 //DB CONNECTION with SERVER RUNNING
 connectDB()
     .then(() => {
