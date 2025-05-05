@@ -62,7 +62,6 @@ const getUserData = async (accessToken) => {
 export const linkedInCallback = async (req, res) => {
     try {
         const { code } = req.query;
-        console.log(code);
 
         const accessToken = await getAccessToken(code);
 
@@ -105,7 +104,7 @@ export const linkedInCallback = async (req, res) => {
             httpOnly: true,
         });
 
-        res.redirect("http://localhost:5173/profile");
+        res.redirect("http://localhost:3000/profile");
     } catch (error) {
         console.log(error);
         return res.status(500).json({
@@ -118,6 +117,7 @@ export const linkedInCallback = async (req, res) => {
 export const getUser = async (req, res) => {
     try {
         const token = req.cookies.token;
+        console.log(token);
         if (!token) {
             return res.status(401).json({
                 message: "Unauthorized",
@@ -146,4 +146,34 @@ export const getUser = async (req, res) => {
             },
         });
     } catch (error) {}
+};
+
+export const SignIn = async (req, res) => {
+    try {
+        const { email, name, image, accessToken } = req.body;
+
+        // Check if user already exists
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            // Create new user
+            user = new User({
+                email,
+                name,
+                profilePicture: image,
+            });
+            await user.save();
+        } else {
+            // Update existing user
+            user.email = email;
+            user.name = name;
+            user.profilePicture = image;
+            await user.save();
+        }
+
+        res.status(200).json(user);
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
 };

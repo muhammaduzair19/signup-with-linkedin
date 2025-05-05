@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState } from "react";
 
 const ProfilePage = () => {
@@ -6,7 +7,7 @@ const ProfilePage = () => {
     useEffect(() => {
         const getUserData = async () => {
             const response = await fetch(
-                "http://localhost:3000/api/v1/auth/user",
+                "http://localhost:5000/api/v1/auth/user",
                 {
                     method: "GET",
                     credentials: "include",
@@ -60,8 +61,6 @@ const ProfilePage = () => {
                                 {user?.phone || "No Phone Number"}
                             </p>
                         </div>
-
-                      
                     </div>
                 </div>
             </div>
