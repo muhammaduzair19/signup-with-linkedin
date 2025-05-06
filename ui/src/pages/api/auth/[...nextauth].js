@@ -1,4 +1,3 @@
-// pages/api/auth/[...nextauth].js
 import NextAuth from "next-auth";
 import LinkedInProvider from "next-auth/providers/linkedin";
 
@@ -30,7 +29,6 @@ export default NextAuth({
         }),
     ],
     secret: process.env.NEXTAUTH_SECRET,
-    debug: true,
     callbacks: {
         async jwt({ token, account }) {
             if (account) {
@@ -42,7 +40,6 @@ export default NextAuth({
             session.accessToken = token.accessToken;
             return session;
         },
-        // pages/api/auth/[...nextauth].js - in the signIn callback
         async signIn({ user, account, profile }) {
             try {
                 const response = await fetch(
@@ -58,7 +55,7 @@ export default NextAuth({
                             linkedinId: user.id,
                             image: user.image,
                         }),
-                        credentials: "include", // Important for cookies
+                        credentials: "include", 
                     }
                 );
 
@@ -66,8 +63,7 @@ export default NextAuth({
                 console.log(data);
 
                 if (data.success) {
-                    // Return the redirect URL to be handled by NextAuth
-                    return data.redirectUrl || "/profile/"+ data.token;
+                    return data.redirectUrl || `/profile/${data.token}`;
                 }
 
                 return false;

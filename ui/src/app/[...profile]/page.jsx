@@ -4,11 +4,8 @@ import React, { useEffect, useState } from "react";
 
 const ProfilePage = () => {
     const [user, setUser] = useState(null);
-    const params = useParams()
-    
-    
-    
-    
+    const params = useParams();
+
     useEffect(() => {
         const getUserData = async () => {
             const response = await fetch(
@@ -25,17 +22,15 @@ const ProfilePage = () => {
                 console.error("Failed to fetch user data:", data);
             }
         };
-                const token = params.profile[1];
-        if(token){
+        const token = params.profile[1];
+        if (token) {
             getUserData();
         }
-
     }, []);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto">
-                {/* Header */}
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-gray-900">
                         Your Profile
@@ -45,14 +40,10 @@ const ProfilePage = () => {
                     </p>
                 </div>
 
-                {/* Profile Card */}
                 <div className="bg-white shadow-xl rounded-lg overflow-hidden">
-                    {/* Cover Photo */}
                     <div className="bg-blue-600 h-32 w-full"></div>
 
-                    {/* Profile Info */}
                     <div className="px-6 pb-6">
-                        {/* Avatar and Name */}
                         <div className="flex flex-col items-center -mt-16">
                             <img
                                 className="w-32 h-32 rounded-full border-4 border-white object-cover shadow-md"

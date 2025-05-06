@@ -1,5 +1,4 @@
 import {
-    NODE_ENV,
     JWT_SECRET,
 } from "../config/config.js";
 import { User } from "../models/user.model.js";
@@ -155,10 +154,9 @@ export const SignIn = async (req, res) => {
     try {
         const { email, name, image, linkedinId } = req.body;
 
-        // Input validation
         if (!email || !name || !linkedinId) {
             return res.status(400).json({
-                message: "Missing required fields",
+                message: "All fields are required",
             });
         }
 
@@ -185,17 +183,7 @@ export const SignIn = async (req, res) => {
             { expiresIn: "7d" }
         );
 
-        // Set cookie with proper configuration
-        res.cookie("auth_token", token, {
-            httpOnly: true, // Prevent client-side JS access
-            secure: NODE_ENV === "production", // HTTPS only in production
-            sameSite: NODE_ENV === "production" ? "none" : "lax", // CSRF protection
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
-        });
 
-        console.log("token", token);
-
-        // Return success with redirect URL
         return res.status(200).json({
             success: true,
             redirectUrl: `/profile/${token}`,
