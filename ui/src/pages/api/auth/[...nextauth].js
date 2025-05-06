@@ -1,14 +1,12 @@
 // pages/api/auth/[...nextauth].js
 import NextAuth from "next-auth";
 import LinkedInProvider from "next-auth/providers/linkedin";
-import axios from "axios";
 
 export default NextAuth({
     providers: [
         LinkedInProvider({
             clientId: process.env.LINKEDIN_CLIENT_ID,
             clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
-            issuer: "https://www.linkedin.com",
             authorization: {
                 params: {
                     scope: "openid profile email",
@@ -16,6 +14,7 @@ export default NextAuth({
                     redirect_uri: `${process.env.NEXTAUTH_URL}/api/auth/callback/linkedin`,
                 },
             },
+            issuer: "https://www.linkedin.com/oauth",
             jwks_endpoint: "https://www.linkedin.com/oauth/openid/jwks",
             profile(profile) {
                 return {
@@ -25,40 +24,57 @@ export default NextAuth({
                     image: profile.picture,
                 };
             },
+            client: {
+                token_endpoint_auth_method: "client_secret_post",
+            },
         }),
     ],
+    secret: process.env.NEXTAUTH_SECRET,
+    debug: true,
     callbacks: {
+        async jwt({ token, account }) {
+            if (account) {
+                token.accessToken = account.access_token;
+            }
+            return token;
+        },
+        async session({ session, token }) {
+            session.accessToken = token.accessToken;
+            return session;
+        },
+        // pages/api/auth/[...nextauth].js - in the signIn callback
         async signIn({ user, account, profile }) {
             try {
-                // Send user data to Express backend
-                const response = await axios.post(
+                const response = await fetch(
                     `${process.env.BACKEND_URL}/api/v1/auth/signin`,
                     {
-                        email: user.email,
-                        name: user.name,
-                        image: user.image,
-                        accessToken: account.access_token, // Optional: store access token
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            email: user.email,
+                            name: user.name,
+                            linkedinId: user.id,
+                            image: user.image,
+                        }),
+                        credentials: "include", // Important for cookies
                     }
                 );
 
-                if (response.status !== 200) {
-                    throw new Error("Failed to save user");
+                const data = await response.json();
+                console.log(data);
+
+                if (data.success) {
+                    // Return the redirect URL to be handled by NextAuth
+                    return data.redirectUrl || "/profile/"+ data.token;
                 }
 
-                return true;
+                return false;
             } catch (error) {
-                console.error(
-                    "User save error:",
-                    error.response?.data || error.message
-                );
+                console.error("SignIn Error:", error);
                 return false;
             }
         },
-        async session({ session, token }) {
-            session.user.id = token.sub;
-            return session;
-        },
     },
-    secret: process.env.NEXTAUTH_SECRET,
-    debug: process.env.NODE_ENV === "development",
 });

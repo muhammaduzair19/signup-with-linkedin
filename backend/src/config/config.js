@@ -10,4 +10,5 @@ export const {
     CLIENT_ID,
     CLIENT_SECRET,
     REDIRECT_URI,
+    NODE_ENV
 } = process?.env;

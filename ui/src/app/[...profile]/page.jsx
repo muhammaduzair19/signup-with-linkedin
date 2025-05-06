@@ -1,20 +1,23 @@
 "use client";
+import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 const ProfilePage = () => {
     const [user, setUser] = useState(null);
-
+    const params = useParams()
+    
+    
+    
+    
     useEffect(() => {
         const getUserData = async () => {
             const response = await fetch(
-                "http://localhost:5000/api/v1/auth/user",
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/user?token=${token}`,
                 {
                     method: "GET",
                     credentials: "include",
                 }
             );
-            console.log(response);
-
             const data = await response.json();
             if (response.ok) {
                 setUser(data.user);
@@ -22,8 +25,11 @@ const ProfilePage = () => {
                 console.error("Failed to fetch user data:", data);
             }
         };
+                const token = params.profile[1];
+        if(token){
+            getUserData();
+        }
 
-        getUserData();
     }, []);
 
     return (
